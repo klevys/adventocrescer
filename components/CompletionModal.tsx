@@ -12,7 +12,7 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) =>
   const [childrenName, setChildrenName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load saved names when modal opens
+  // Carregar nomes salvos quando o modal abrir
   useEffect(() => {
     if (isOpen) {
         const savedData = localStorage.getItem('familyRegistration');
@@ -35,7 +35,7 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) =>
     setIsSubmitting(true);
     
     // 1. Enviar para Google Forms com Status "Concluído"
-    if (GOOGLE_FORM_CONFIG.FORM_ID && !GOOGLE_FORM_CONFIG.FORM_ID.includes("SUBSTITUA")) {
+    if (GOOGLE_FORM_CONFIG.FORM_ID) {
         try {
             const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
             const formData = new FormData();
@@ -48,6 +48,7 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) =>
                 mode: 'no-cors',
                 body: formData
             });
+            console.log("Conclusão enviada para planilha com sucesso.");
         } catch (error) {
             console.error("Erro ao enviar conclusão para Google Forms:", error);
         }
@@ -73,6 +74,7 @@ Atenciosamente,
 Família ${familyName}`
     );
 
+    // Delay para garantir envio do form antes de sair da página
     setTimeout(() => {
         window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
         setIsSubmitting(false);
@@ -89,8 +91,7 @@ Família ${familyName}`
       
       <div className="relative bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden transform animate-[fadeIn_0.5s_ease-out] border-4 border-christmas-gold">
         
-        {/* Confetti Effect CSS would go in global styles, but purely visual here */}
-        
+        {/* Header Celebration */}
         <div className="bg-gradient-to-b from-christmas-gold to-[#D68215] p-8 text-center relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDQwIDQwIiBvcGFjaXR5PSIwLjEiPjxwYXRoIGQ9Ik0yMCAyMEwzMCAzMEwyMCA0MEwxMCAzMHoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=')] opacity-20"></div>
           

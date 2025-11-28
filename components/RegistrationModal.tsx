@@ -19,23 +19,24 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => 
 
     setIsSubmitting(true);
 
-    // 1. Tentar enviar para o Google Forms (silenciosamente)
-    if (GOOGLE_FORM_CONFIG.FORM_ID && !GOOGLE_FORM_CONFIG.FORM_ID.includes("SUBSTITUA")) {
+    // 1. Enviar para o Google Forms (PLANILHA)
+    if (GOOGLE_FORM_CONFIG.FORM_ID) {
+        const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
+        const formData = new FormData();
+        formData.append(GOOGLE_FORM_CONFIG.ENTRY_PARENTS, parentsName);
+        formData.append(GOOGLE_FORM_CONFIG.ENTRY_CHILDREN, childrenName);
+        formData.append(GOOGLE_FORM_CONFIG.ENTRY_STATUS, "Iniciou");
+        
         try {
-            const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
-            const formData = new FormData();
-            formData.append(GOOGLE_FORM_CONFIG.ENTRY_PARENTS, parentsName);
-            formData.append(GOOGLE_FORM_CONFIG.ENTRY_CHILDREN, childrenName);
-            formData.append(GOOGLE_FORM_CONFIG.ENTRY_STATUS, "Iniciou");
-            
-            // fetch com mode 'no-cors' para evitar erro de CORS do Google Forms
+            // Usamos no-cors pois o Google não retorna JSON para sites externos, mas o envio funciona.
             await fetch(formUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: formData
-            }).catch(err => console.warn("Google Form Warning (AdBlock?):", err));
+            });
+            console.log("Registro enviado para planilha com sucesso.");
         } catch (error) {
-            console.error("Erro ao tentar conectar Google Forms:", error);
+            console.warn("Envio para planilha falhou (possível bloqueador), mas app continuará.", error);
         }
     }
 
@@ -62,7 +63,7 @@ Atenciosamente,
 ${parentsName}`
     );
 
-    // Pequeno delay para UX suave
+    // Pequeno delay para garantir que a UI atualize antes de abrir o email
     setTimeout(() => {
         window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
         setIsSubmitting(false);
@@ -146,7 +147,7 @@ ${parentsName}`
                 </button>
                 
                 <p className="text-xs text-center text-gray-400 mt-4 px-4">
-                    Ao clicar, enviaremos um e-mail automático para o Ministério Infantil avisando que vocês começaram!
+                    Ao clicar, você será redirecionado para enviar um e-mail avisando que começou!
                 </p>
             </form>
         </div>

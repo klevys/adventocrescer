@@ -2,22 +2,20 @@ import { AdventDay, IdeaImage } from './types';
 import { Gift, Heart, Star, Music, Book, Sun, Users, Coffee, Home, Smile, Moon, Search, Globe } from 'lucide-react';
 
 // ==================================================================================
-// CONFIGURAÇÃO DO GOOGLE FORMS (INTEGRAÇÃO COM PLANILHA)
+// CONFIGURAÇÃO DE INTEGRAÇÃO (GOOGLE FORMS)
 // ==================================================================================
-// IMPORTANTE: Use a conta klevys@sibapa.com para criar o formulário.
-// 1. Crie um Google Form com 3 perguntas de texto curto: "Nome dos Pais", "Nome dos Filhos", "Status".
-// 2. Gere um "Link preenchido automaticamente", coloque "TESTE" nos campos e copie o link gerado.
-// 3. Substitua os valores abaixo pelos IDs encontrados no link.
+// Os IDs abaixo conectam o site à planilha do Google da Igreja.
+// Quando a família se registra ou conclui, os dados são enviados automaticamente.
 // ==================================================================================
 
 export const GOOGLE_FORM_CONFIG = {
-  // O ID longo que vem logo após '/d/e/' e antes de '/viewform' na URL
+  // ID do Formulário
   FORM_ID: "1FAIpQLScXVDhk854SsYw1CN9XKaSTCl8F1tdc_iCjI-YVguvqxMLHyA", 
   
-  // Os IDs dos campos (entry.XXXXXX)
-  ENTRY_PARENTS: "entry.905496285",   // ID do campo "Nome dos Pais"
-  ENTRY_CHILDREN: "entry.1735274493", // ID do campo "Nome dos Filhos"
-  ENTRY_STATUS: "entry.2131853291"    // ID do campo "Status"
+  // IDs dos Campos
+  ENTRY_PARENTS: "entry.905496285",   // Nome dos Pais
+  ENTRY_CHILDREN: "entry.1735274493", // Nome dos Filhos
+  ENTRY_STATUS: "entry.2131853291"    // Status (Iniciou/Concluído)
 };
 
 export const ADVENT_DAYS: AdventDay[] = [

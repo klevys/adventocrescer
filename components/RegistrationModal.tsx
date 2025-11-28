@@ -40,34 +40,11 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => 
         }
     }
 
-    // 2. Salvar localmente e liberar o app
-    onRegister(parentsName, childrenName);
-    
-    // 3. Preparar e abrir cliente de Email
-    const recipients = "lidia@sibapa.com,vanessa@sibapa.com";
-    const familyName = parentsName.split(' ').pop() || parentsName.split(' ')[0];
-    const subject = encodeURIComponent(`Início da Jornada do Advento - Família ${familyName}`);
-    
-    const body = encodeURIComponent(
-`Olá Lidia e Vanessa!
-
-Nossa família está começando hoje a jornada do Advento de Natal!
-
-👨‍👩‍👧‍👦 Família: ${familyName}
-👤 Pais: ${parentsName}
-👶 Filhos: ${childrenName}
-
-Estamos animados para viver esse tempo juntos!
-
-Atenciosamente,
-${parentsName}`
-    );
-
-    // Pequeno delay para garantir que a UI atualize antes de abrir o email
+    // 2. Salvar localmente e liberar o app com um pequeno delay para UX
     setTimeout(() => {
-        window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
+        onRegister(parentsName, childrenName);
         setIsSubmitting(false);
-    }, 500);
+    }, 1000);
   };
 
   return (
@@ -137,7 +114,7 @@ ${parentsName}`
                     className="w-full mt-4 bg-gradient-to-r from-christmas-green to-[#124a2a] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-christmas-green/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-wait"
                 >
                     {isSubmitting ? (
-                        <span>Enviando...</span>
+                        <span>Salvando...</span>
                     ) : (
                         <>
                             <span>Iniciar Jornada</span>
@@ -145,10 +122,6 @@ ${parentsName}`
                         </>
                     )}
                 </button>
-                
-                <p className="text-xs text-center text-gray-400 mt-4 px-4">
-                    Ao clicar, você será redirecionado para enviar um e-mail avisando que começou!
-                </p>
             </form>
         </div>
       </div>

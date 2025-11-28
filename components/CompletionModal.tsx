@@ -11,6 +11,7 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) =>
   const [parentsName, setParentsName] = useState('');
   const [childrenName, setChildrenName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSent, setIsSent] = useState(false);
 
   // Carregar nomes salvos quando o modal abrir
   useEffect(() => {
@@ -54,32 +55,13 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) =>
         }
     }
 
-    // 2. Preparar e enviar Email
-    const recipients = "lidia@sibapa.com,vanessa@sibapa.com";
-    const familyName = parentsName.split(' ').pop() || parentsName.split(' ')[0];
-    const subject = encodeURIComponent(`CONCLUSÃO do Advento de Natal - Família ${familyName}`);
-    
-    const body = encodeURIComponent(
-`🎉 Parabéns!
-
-Nossa família completou TODAS as atividades do Advento de Natal!
-
-👨‍👩‍👧‍👦 Família: ${familyName}
-👤 Pais: ${parentsName}
-👶 Filhos: ${childrenName}
-
-Foi um tempo precioso em família fortalecendo nossa fé.
-
-Atenciosamente,
-Família ${familyName}`
-    );
-
-    // Delay para garantir envio do form antes de sair da página
+    // 2. Feedback visual e fechar
+    setIsSent(true);
     setTimeout(() => {
-        window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
         setIsSubmitting(false);
-        setTimeout(onClose, 1000);
-    }, 500);
+        setIsSent(false);
+        onClose();
+    }, 2000);
   };
 
   return (
@@ -143,10 +125,12 @@ Família ${familyName}`
 
             <button 
               type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-christmas-green text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:bg-[#124a2a] transform active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-70"
+              disabled={isSubmitting || isSent}
+              className={`w-full font-bold py-3.5 px-4 rounded-xl shadow-lg transform active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-70 ${
+                  isSent ? 'bg-green-600 text-white' : 'bg-christmas-green text-white hover:bg-[#124a2a]'
+              }`}
             >
-               {isSubmitting ? 'Enviando...' : (
+               {isSubmitting ? 'Enviando...' : isSent ? 'Enviado com Sucesso!' : (
                 <>
                   <Send size={18} />
                   Enviar Conclusão

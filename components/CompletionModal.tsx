@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Send, PartyPopper, X, Trophy } from 'lucide-react';
+import { GOOGLE_FORM_CONFIG } from '../constants';
 
 interface CompletionModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface CompletionModalProps {
 const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) => {
   const [parentsName, setParentsName] = useState('');
   const [childrenName, setChildrenName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load saved names when modal opens
   useEffect(() => {
@@ -28,9 +30,30 @@ const CompletionModal: React.FC<CompletionModalProps> = ({ isOpen, onClose }) =>
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
+    // 1. Enviar para Google Forms com Status "Concluído"
+    if (GOOGLE_FORM_CONFIG.FORM_ID && !GOOGLE_FORM_CONFIG.FORM_ID.includes("SUBSTITUA")) {
+        try {
+            const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
+            const formData = new FormData();
+            formData.append(GOOGLE_FORM_CONFIG.ENTRY_PARENTS, parentsName);
+            formData.append(GOOGLE_FORM_CONFIG.ENTRY_CHILDREN, childrenName);
+            formData.append(GOOGLE_FORM_CONFIG.ENTRY_STATUS, "Concluído");
+            
+            await fetch(formUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            });
+        } catch (error) {
+            console.error("Erro ao enviar conclusão para Google Forms:", error);
+        }
+    }
+
+    // 2. Preparar e enviar Email
     const recipients = "lidia@sibapa.com,vanessa@sibapa.com";
     const familyName = parentsName.split(' ').pop() || parentsName.split(' ')[0];
     const subject = encodeURIComponent(`CONCLUSÃO do Advento de Natal - Família ${familyName}`);
@@ -50,9 +73,11 @@ Atenciosamente,
 Família ${familyName}`
     );
 
-    window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
-    
-    setTimeout(onClose, 2000);
+    setTimeout(() => {
+        window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
+        setIsSubmitting(false);
+        setTimeout(onClose, 1000);
+    }, 500);
   };
 
   return (
@@ -117,10 +142,15 @@ Família ${familyName}`
 
             <button 
               type="submit"
-              className="w-full bg-christmas-green text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:bg-[#124a2a] transform active:scale-95 transition-all flex items-center justify-center gap-2 mt-4"
+              disabled={isSubmitting}
+              className="w-full bg-christmas-green text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:bg-[#124a2a] transform active:scale-95 transition-all flex items-center justify-center gap-2 mt-4 disabled:opacity-70"
             >
-              <Send size={18} />
-              Enviar Conclusão
+               {isSubmitting ? 'Enviando...' : (
+                <>
+                  <Send size={18} />
+                  Enviar Conclusão
+                </>
+               )}
             </button>
           </form>
         </div>

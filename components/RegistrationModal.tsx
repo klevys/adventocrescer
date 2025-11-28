@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Send, Heart, Star } from 'lucide-react';
 import Logo from './Logo';
+import { GOOGLE_FORM_CONFIG } from '../constants';
 
 interface RegistrationModalProps {
   onRegister: (parents: string, children: string) => void;
@@ -9,16 +10,40 @@ interface RegistrationModalProps {
 const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => {
   const [parentsName, setParentsName] = useState('');
   const [childrenName, setChildrenName] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!parentsName.trim() || !childrenName.trim()) return;
 
-    // Save to parent component/local storage
+    setIsSubmitting(true);
+
+    // 1. Tentar enviar para o Google Forms (se configurado)
+    if (GOOGLE_FORM_CONFIG.FORM_ID && !GOOGLE_FORM_CONFIG.FORM_ID.includes("SUBSTITUA")) {
+        try {
+            const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
+            const formData = new FormData();
+            formData.append(GOOGLE_FORM_CONFIG.ENTRY_PARENTS, parentsName);
+            formData.append(GOOGLE_FORM_CONFIG.ENTRY_CHILDREN, childrenName);
+            formData.append(GOOGLE_FORM_CONFIG.ENTRY_STATUS, "Iniciou");
+            
+            // fetch com mode 'no-cors' envia os dados mas não retorna resposta legível (o que é normal para GForms)
+            await fetch(formUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            });
+        } catch (error) {
+            console.error("Erro ao enviar para Google Forms:", error);
+            // Não bloqueamos o fluxo se falhar o form, seguimos para o email
+        }
+    }
+
+    // 2. Salvar localmente e liberar o app
     onRegister(parentsName, childrenName);
     
-    // Prepare Mailto
+    // 3. Preparar e abrir cliente de Email
     const recipients = "lidia@sibapa.com,vanessa@sibapa.com";
     const familyName = parentsName.split(' ').pop() || parentsName.split(' ')[0];
     const subject = encodeURIComponent(`Início da Jornada do Advento - Família ${familyName}`);
@@ -38,7 +63,11 @@ Atenciosamente,
 ${parentsName}`
     );
 
-    window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
+    // Pequeno delay para garantir que o navegador processou o fetch anterior
+    setTimeout(() => {
+        window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
+        setIsSubmitting(false);
+    }, 500);
   };
 
   return (
@@ -79,6 +108,7 @@ ${parentsName}`
                     <input 
                         type="text" 
                         required
+                        disabled={isSubmitting}
                         value={parentsName}
                         onChange={(e) => setParentsName(e.target.value)}
                         placeholder="Ex: Carlos e Ana Souza"
@@ -93,6 +123,7 @@ ${parentsName}`
                     <input 
                         type="text" 
                         required
+                        disabled={isSubmitting}
                         value={childrenName}
                         onChange={(e) => setChildrenName(e.target.value)}
                         placeholder="Ex: Davi, Sofia e Lucas"
@@ -102,10 +133,17 @@ ${parentsName}`
 
                 <button 
                     type="submit"
-                    className="w-full mt-4 bg-gradient-to-r from-christmas-green to-[#124a2a] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-christmas-green/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+                    disabled={isSubmitting}
+                    className="w-full mt-4 bg-gradient-to-r from-christmas-green to-[#124a2a] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-christmas-green/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-wait"
                 >
-                    <span>Iniciar Jornada</span>
-                    <Send size={20} className="group-hover:translate-x-1 transition-transform" />
+                    {isSubmitting ? (
+                        <span>Enviando...</span>
+                    ) : (
+                        <>
+                            <span>Iniciar Jornada</span>
+                            <Send size={20} className="group-hover:translate-x-1 transition-transform" />
+                        </>
+                    )}
                 </button>
                 
                 <p className="text-xs text-center text-slate-400 mt-4 px-4">

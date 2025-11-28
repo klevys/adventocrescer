@@ -1,10 +1,10 @@
 import { AdventDay, IdeaImage } from './types';
-import { Gift, Heart, Star, Music, Book, Sun, Users, Coffee, Home, Smile, Moon } from 'lucide-react';
+import { Gift, Heart, Star, Music, Book, Sun, Users, Coffee, Home, Smile, Moon, Search, Globe } from 'lucide-react';
 
 // ==================================================================================
 // CONFIGURAÇÃO DO GOOGLE FORMS (INTEGRAÇÃO COM PLANILHA)
 // ==================================================================================
-// Para conectar com sua planilha:
+// IMPORTANTE: Use a conta klevys@sibapa.com para criar o formulário.
 // 1. Crie um Google Form com 3 perguntas de texto curto: "Nome dos Pais", "Nome dos Filhos", "Status".
 // 2. Gere um "Link preenchido automaticamente", coloque "TESTE" nos campos e copie o link gerado.
 // 3. Substitua os valores abaixo pelos IDs encontrados no link.
@@ -42,7 +42,7 @@ export const ADVENT_DAYS: AdventDay[] = [
     title: "Noite da História Bíblica",
     activity: "Ler juntos Lucas 1:26-38 e conversar sobre o 'sim' de Maria.",
     challenge: "Compartilhar: 'Qual foi um 'sim' difícil que eu dei para Deus este ano?'",
-    verse: "Lucas 1:38", // Inferido do contexto
+    verse: "Lucas 1:38", 
     objective: "Obediência.",
     iconName: "Book"
   },

@@ -15,17 +15,15 @@ function App() {
   const [selectedDay, setSelectedDay] = useState<AdventDay | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompletionModalOpen, setIsCompletionModalOpen] = useState(false);
-  const [isRegistered, setIsRegistered] = useState(true); // Default true to avoid flash, checked in useEffect
+  
+  // Initialize state synchronously from localStorage to avoid flash of content
+  const [isRegistered, setIsRegistered] = useState<boolean>(() => {
+    const saved = localStorage.getItem('familyRegistration');
+    return !!saved;
+  });
 
-  // Load progress and registration status from local storage
+  // Load progress
   useEffect(() => {
-    // 1. Check Registration
-    const registrationData = localStorage.getItem('familyRegistration');
-    if (!registrationData) {
-        setIsRegistered(false);
-    }
-
-    // 2. Check Progress
     const savedProgress = localStorage.getItem('adventProgress');
     if (savedProgress) {
       try {
@@ -72,10 +70,10 @@ function App() {
   const progressPercentage = Math.round((completedDays.length / 25) * 100);
 
   return (
-    <div className="min-h-screen font-body text-slate-800 bg-slate-50 selection:bg-christmas-red selection:text-white overflow-x-hidden">
+    <div className="min-h-screen font-body text-christmas-slate bg-[#FFFDF5] selection:bg-christmas-dark selection:text-white overflow-x-hidden">
       <SnowEffect />
       
-      {/* Registration Wall */}
+      {/* Registration Wall - Only shows if not registered */}
       {!isRegistered && (
         <RegistrationModal onRegister={handleRegistration} />
       )}
@@ -85,21 +83,21 @@ function App() {
       <main className="max-w-6xl mx-auto px-6 py-12 -mt-10 relative z-20">
         
         {/* Progress Bar */}
-        <div className="bg-white rounded-2xl p-6 shadow-xl mb-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-slate-100">
+        <div className="bg-white rounded-2xl p-6 shadow-xl mb-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-christmas-cream/50">
             <div className="w-full md:w-auto text-center md:text-left">
-                <h3 className="font-display text-2xl text-christmas-red font-bold">Seu Progresso</h3>
-                <p className="text-sm text-slate-500">Continue firme na jornada!</p>
+                <h3 className="font-display text-2xl text-christmas-dark font-bold">Sua Jornada</h3>
+                <p className="text-sm text-gray-500">Cada dia uma nova descoberta em família.</p>
             </div>
             <div className="flex-1 w-full flex items-center gap-4">
-                <div className="w-full h-5 bg-slate-100 rounded-full overflow-hidden shadow-inner border border-slate-200">
+                <div className="w-full h-5 bg-gray-100 rounded-full overflow-hidden shadow-inner border border-gray-200">
                     <div 
-                        className="h-full bg-gradient-to-r from-christmas-gold to-christmas-red transition-all duration-1000 ease-out relative"
+                        className="h-full bg-gradient-to-r from-christmas-gold to-christmas-dark transition-all duration-1000 ease-out relative"
                         style={{ width: `${progressPercentage}%` }}
                     >
                         <div className="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite]"></div>
                     </div>
                 </div>
-                <span className="font-bold text-christmas-red min-w-[3rem] text-lg">{progressPercentage}%</span>
+                <span className="font-bold text-christmas-dark min-w-[3rem] text-lg">{progressPercentage}%</span>
             </div>
         </div>
 
@@ -120,7 +118,7 @@ function App() {
 
       <IdeasSection />
 
-      <footer className="bg-christmas-dark text-white py-12 text-center relative overflow-hidden">
+      <footer className="bg-[#2D2D2D] text-white py-12 text-center relative overflow-hidden mt-12">
         {/* Footer Background Pattern */}
         <div className="absolute inset-0 opacity-5 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white to-transparent scale-150"></div>
         
@@ -136,7 +134,9 @@ function App() {
             </p>
             
             <div className="flex flex-col md:flex-row justify-center items-center gap-3 md:gap-6 text-sm text-white/50 mb-8 font-medium tracking-widest uppercase">
-                <p>@trilharcrescer</p>
+                <a href="https://instagram.com/trilharcrescer" target="_blank" rel="noopener noreferrer" className="hover:text-christmas-gold transition-colors">
+                    @trilharcrescer
+                </a>
                 <span className="hidden md:inline w-1 h-1 bg-christmas-gold rounded-full"></span>
                 <p>Feito com amor para famílias</p>
             </div>

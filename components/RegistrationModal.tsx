@@ -19,7 +19,7 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => 
 
     setIsSubmitting(true);
 
-    // 1. Tentar enviar para o Google Forms (se configurado)
+    // 1. Tentar enviar para o Google Forms (silenciosamente)
     if (GOOGLE_FORM_CONFIG.FORM_ID && !GOOGLE_FORM_CONFIG.FORM_ID.includes("SUBSTITUA")) {
         try {
             const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
@@ -28,15 +28,14 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => 
             formData.append(GOOGLE_FORM_CONFIG.ENTRY_CHILDREN, childrenName);
             formData.append(GOOGLE_FORM_CONFIG.ENTRY_STATUS, "Iniciou");
             
-            // fetch com mode 'no-cors' envia os dados mas não retorna resposta legível (o que é normal para GForms)
+            // fetch com mode 'no-cors' para evitar erro de CORS do Google Forms
             await fetch(formUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: formData
-            });
+            }).catch(err => console.warn("Google Form Warning (AdBlock?):", err));
         } catch (error) {
-            console.error("Erro ao enviar para Google Forms:", error);
-            // Não bloqueamos o fluxo se falhar o form, seguimos para o email
+            console.error("Erro ao tentar conectar Google Forms:", error);
         }
     }
 
@@ -63,7 +62,7 @@ Atenciosamente,
 ${parentsName}`
     );
 
-    // Pequeno delay para garantir que o navegador processou o fetch anterior
+    // Pequeno delay para UX suave
     setTimeout(() => {
         window.location.href = `mailto:${recipients}?subject=${subject}&body=${body}`;
         setIsSubmitting(false);
@@ -75,13 +74,13 @@ ${parentsName}`
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-20 -left-20 w-96 h-96 bg-christmas-gold/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 w-80 h-80 bg-christmas-red/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-80 h-80 bg-christmas-dark/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-[fadeInUp_0.6s_ease-out]">
         
         {/* Header */}
-        <div className="bg-gradient-to-br from-christmas-red to-[#B01E20] p-8 text-center relative">
+        <div className="bg-gradient-to-br from-christmas-dark to-[#B03A12] p-8 text-center relative">
            <div className="absolute top-0 left-0 w-full h-full opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent"></div>
            
            <div className="w-32 mx-auto mb-6 transform hover:scale-105 transition-transform duration-500">
@@ -95,7 +94,7 @@ ${parentsName}`
         {/* Form */}
         <div className="p-8">
             <div className="mb-6 text-center">
-                <p className="text-slate-600 leading-relaxed">
+                <p className="text-christmas-slate leading-relaxed">
                     Antes de acessarem o calendário, contem pra gente quem vai participar dessa jornada especial.
                 </p>
             </div>
@@ -103,7 +102,7 @@ ${parentsName}`
             <form onSubmit={handleSubmit} className="space-y-5">
                 <div className="space-y-2">
                     <label className="flex items-center gap-2 text-sm font-bold text-christmas-dark uppercase tracking-wider">
-                        <Heart size={16} className="text-christmas-red" /> Nome dos Pais
+                        <Heart size={16} className="text-christmas-dark" /> Nome dos Pais
                     </label>
                     <input 
                         type="text" 
@@ -112,7 +111,7 @@ ${parentsName}`
                         value={parentsName}
                         onChange={(e) => setParentsName(e.target.value)}
                         placeholder="Ex: Carlos e Ana Souza"
-                        className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-christmas-gold focus:ring-0 outline-none transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-christmas-gold focus:ring-0 outline-none transition-all placeholder:text-gray-400 text-christmas-slate"
                     />
                 </div>
 
@@ -127,7 +126,7 @@ ${parentsName}`
                         value={childrenName}
                         onChange={(e) => setChildrenName(e.target.value)}
                         placeholder="Ex: Davi, Sofia e Lucas"
-                        className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-christmas-gold focus:ring-0 outline-none transition-all placeholder:text-slate-400"
+                        className="w-full px-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:border-christmas-gold focus:ring-0 outline-none transition-all placeholder:text-gray-400 text-christmas-slate"
                     />
                 </div>
 
@@ -146,7 +145,7 @@ ${parentsName}`
                     )}
                 </button>
                 
-                <p className="text-xs text-center text-slate-400 mt-4 px-4">
+                <p className="text-xs text-center text-gray-400 mt-4 px-4">
                     Ao clicar, enviaremos um e-mail automático para o Ministério Infantil avisando que vocês começaram!
                 </p>
             </form>

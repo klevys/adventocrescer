@@ -3,22 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Advento de Natal</title>
+    <title>Advento de Natal - Crescer</title>
+    <meta name="description" content="Um guia interativo de 25 dias para celebrar o Advento de Natal em família.">
+    
+    <!-- Tailwind CSS (via CDN for simplicity in this setup, though build step is recommended for larger apps) -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:wght@300;400;700;900&family=Mountains+of+Christmas:wght@400;700&display=swap" rel="stylesheet">
+    
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               christmas: {
-                red: '#D42426',
-                green: '#165B33',
-                gold: '#F8B229',
-                cream: '#F3E5AB',
-                dark: '#0F2C1F'
+                red: '#D42426',    // Tom original de vermelho (backup)
+                green: '#165B33',  // Tom original de verde (backup)
+                gold: '#F6921E',   // Laranja Ouro da Logo
+                cream: '#FDDCA9',  // Pêssego da Logo
+                dark: '#DA4816',   // Terracota da Logo (usado como cor primária forte)
+                slate: '#4A4A4A'   // Cinza Chumbo da Logo
               }
             },
             fontFamily: {
@@ -68,7 +75,7 @@
 }
 </script>
 </head>
-  <body class="bg-slate-50 text-slate-800">
+  <body class="bg-[#FFFDF5] text-[#4A4A4A]">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

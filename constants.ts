@@ -13,9 +13,9 @@ export const GOOGLE_FORM_CONFIG = {
   FORM_ID: "1FAIpQLScXVDhk854SsYw1CN9XKaSTCl8F1tdc_iCjI-YVguvqxMLHyA", 
   
   // IDs dos Campos
-  ENTRY_PARENTS: "entry.905496285",   // Nome dos Pais
-  ENTRY_CHILDREN: "entry.1735274493", // Nome dos Filhos
-  ENTRY_STATUS: "entry.2131853291"    // Status (Iniciou/Concluído)
+  ENTRY_PARENTS: "entry.905496285",   
+  ENTRY_CHILDREN: "entry.1735274493", 
+  ENTRY_STATUS: "entry.2131853291"    
 };
 
 export const ADVENT_DAYS: AdventDay[] = [

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, Heart, Star } from 'lucide-react';
+import { Send, Heart, Star, LogIn } from 'lucide-react';
 import Logo from './Logo';
 import { GOOGLE_FORM_CONFIG } from '../constants';
 
@@ -19,32 +19,71 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => 
 
     setIsSubmitting(true);
 
-    // 1. Enviar para o Google Forms (PLANILHA)
+    // 1. Tenta enviar via Iframe oculto (Maneira mais robusta para Google Forms)
+    // Criamos um form invisível no DOM e submetemos ele para um iframe invisível
     if (GOOGLE_FORM_CONFIG.FORM_ID) {
-        const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
-        const formData = new FormData();
-        formData.append(GOOGLE_FORM_CONFIG.ENTRY_PARENTS, parentsName);
-        formData.append(GOOGLE_FORM_CONFIG.ENTRY_CHILDREN, childrenName);
-        formData.append(GOOGLE_FORM_CONFIG.ENTRY_STATUS, "Iniciou");
-        
         try {
-            // Usamos no-cors pois o Google não retorna JSON para sites externos, mas o envio funciona.
-            await fetch(formUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            });
-            console.log("Registro enviado para planilha com sucesso.");
+            const iframeId = 'hidden_iframe_reg';
+            let iframe = document.getElementById(iframeId) as HTMLIFrameElement;
+            
+            if (!iframe) {
+                iframe = document.createElement('iframe');
+                iframe.id = iframeId;
+                iframe.name = iframeId;
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+            }
+
+            const formUrl = `https://docs.google.com/forms/d/e/${GOOGLE_FORM_CONFIG.FORM_ID}/formResponse`;
+            
+            const form = document.createElement('form');
+            form.target = iframeId;
+            form.action = formUrl;
+            form.method = 'POST';
+            form.style.display = 'none';
+
+            const inputParents = document.createElement('input');
+            inputParents.type = 'hidden';
+            inputParents.name = GOOGLE_FORM_CONFIG.ENTRY_PARENTS;
+            inputParents.value = parentsName;
+            form.appendChild(inputParents);
+
+            const inputChildren = document.createElement('input');
+            inputChildren.type = 'hidden';
+            inputChildren.name = GOOGLE_FORM_CONFIG.ENTRY_CHILDREN;
+            inputChildren.value = childrenName;
+            form.appendChild(inputChildren);
+
+            const inputStatus = document.createElement('input');
+            inputStatus.type = 'hidden';
+            inputStatus.name = GOOGLE_FORM_CONFIG.ENTRY_STATUS;
+            inputStatus.value = "Iniciou";
+            form.appendChild(inputStatus);
+
+            document.body.appendChild(form);
+            form.submit();
+
+            // Pequeno delay para garantir que o submit foi processado pelo browser
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Limpeza
+            document.body.removeChild(form);
         } catch (error) {
-            console.warn("Envio para planilha falhou (possível bloqueador), mas app continuará.", error);
+            console.warn("Erro ao tentar enviar formulário via iframe:", error);
         }
     }
 
-    // 2. Salvar localmente e liberar o app com um pequeno delay para UX
+    // 2. Salvar localmente e liberar o app
     setTimeout(() => {
         onRegister(parentsName, childrenName);
         setIsSubmitting(false);
     }, 1000);
+  };
+
+  const handleAlreadyRegistered = () => {
+    // Pula o envio para o Google Forms e libera o app com dados genéricos
+    // Isso evita duplicidade na planilha
+    onRegister("Família", "Retornando");
   };
 
   return (
@@ -108,20 +147,31 @@ const RegistrationModal: React.FC<RegistrationModalProps> = ({ onRegister }) => 
                     />
                 </div>
 
-                <button 
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full mt-4 bg-gradient-to-r from-christmas-green to-[#124a2a] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-christmas-green/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-wait"
-                >
-                    {isSubmitting ? (
-                        <span>Salvando...</span>
-                    ) : (
-                        <>
-                            <span>Iniciar Jornada</span>
-                            <Send size={20} className="group-hover:translate-x-1 transition-transform" />
-                        </>
-                    )}
-                </button>
+                <div className="pt-2">
+                    <button 
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full bg-gradient-to-r from-christmas-green to-[#124a2a] text-white font-bold py-4 px-6 rounded-xl shadow-lg shadow-christmas-green/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group disabled:opacity-70 disabled:cursor-wait"
+                    >
+                        {isSubmitting ? (
+                            <span>Salvando...</span>
+                        ) : (
+                            <>
+                                <span>Iniciar Jornada</span>
+                                <Send size={20} className="group-hover:translate-x-1 transition-transform" />
+                            </>
+                        )}
+                    </button>
+
+                    <button
+                        type="button"
+                        onClick={handleAlreadyRegistered}
+                        className="w-full mt-4 py-2 text-sm font-medium text-slate-500 hover:text-christmas-dark hover:bg-slate-50 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                        <LogIn size={16} />
+                        Já Cadastrei
+                    </button>
+                </div>
             </form>
         </div>
       </div>
